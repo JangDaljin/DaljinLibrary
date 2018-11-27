@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibraryTestApp", "LibraryTestApp\LibraryTestApp.csproj", "{ECE6975F-275F-463A-827F-296252536929}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpClient", "TcpClient\TcpClient.csproj", "{5688BAA9-5836-42C1-B143-183D15141095}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TcpServer", "TcpServer\TcpServer.csproj", "{C2CABDF8-3AC7-49E5-B6FD-2EF2018BBBD3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ECE6975F-275F-463A-827F-296252536929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECE6975F-275F-463A-827F-296252536929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECE6975F-275F-463A-827F-296252536929}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECE6975F-275F-463A-827F-296252536929}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{5688BAA9-5836-42C1-B143-183D15141095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5688BAA9-5836-42C1-B143-183D15141095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5688BAA9-5836-42C1-B143-183D15141095}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{5688BAA9-5836-42C1-B143-183D15141095}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{C2CABDF8-3AC7-49E5-B6FD-2EF2018BBBD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2CABDF8-3AC7-49E5-B6FD-2EF2018BBBD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2CABDF8-3AC7-49E5-B6FD-2EF2018BBBD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2CABDF8-3AC7-49E5-B6FD-2EF2018BBBD3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {37107FD8-9518-49AF-A1F3-303C6CB1A1B9}
+	EndGlobalSection
+EndGlobal
