@@ -37,9 +37,6 @@ namespace D_TcpServer
         public event DisconnectCallback DisconnectHandler;
         public event ReceiveCallback ReceiveHandler;
 
-        ///<param name="acceptCallback">(string IP, int PORT)=>{...}</Param>
-        ///<param name="receiveCallback">(byte[] data)=>{...}</Param>
-        ///<param name="closeCallback">(bool res)=>{...}</Param>
         public D_TcpServerSocket(int _BINDPORT = 0, int _ListenCount = 10 , 
                                     AcceptCallback acceptCallback = null ,
                                     ReceiveCallback receiveCallback = null,
@@ -71,9 +68,9 @@ namespace D_TcpServer
                     con_CI.IP = IPAddress.Parse(((IPEndPoint)ClientSoc.RemoteEndPoint).Address.ToString()).ToString();
                     con_CI.PORT = ((IPEndPoint)ClientSoc.RemoteEndPoint).Port;
 
-                    Dict_ClientInfo.TryAdd(con_CI.IP , con_CI);
+                    Dict_ClientInfo.TryAdd(string.Format("{0}:{1}", con_CI.IP ,con_CI.PORT) , con_CI);
 
-                    AcceptHandler?.Invoke(con_CI.IP);
+                    AcceptHandler?.Invoke(con_CI.IP, con_CI.PORT);
 
                     ReceiveStart(con_CI);
                 }
@@ -96,7 +93,7 @@ namespace D_TcpServer
             catch(SocketException soc_e)
             {
                 Console.WriteLine(soc_e.Message);
-                Disconnect(_CI.IP);
+                Disconnect(_CI.IP, _CI.PORT);
                 return;
             }
             catch(ObjectDisposedException od_e)
@@ -107,38 +104,68 @@ namespace D_TcpServer
 
             if(data_len > 0)
             {
-                ReceiveHandler?.Invoke(_CI.buffer , _CI.IP);
+                ReceiveHandler?.Invoke(_CI.buffer , _CI.IP , _CI.PORT);
                 Array.Clear(_CI.buffer, 0, data_len);
             }
             ReceiveStart(_CI);
         }
 
-        public void SendOne(string _IP , int _PORT)
+        public async void SendOne(byte[] data , string _IP , int _PORT)
         {
-            
+            ClientInfo _CI = null;
+            Dict_ClientInfo.TryGetValue(string.Format("{0}:{1}", _IP, _PORT), out _CI);
+
+            await Task.Run(
+                    new Action(
+                        () =>
+                            {
+                                _CI.Soc.Send(data, 0, data.Length, SocketFlags.None);
+                            }
+                    ));
         }
 
-        public void SendAll()
+        public void Disconnect(string _IP , int _PORT)
         {
-
+            ClientInfo temp = null;
+            bool result = Dict_ClientInfo.TryRemove(string.Format("{0}:{1}",_IP ,_PORT) , out temp);
+            temp?.Soc.Close();
+            DisconnectHandler?.Invoke(result, temp?.IP , temp.PORT);
         }
 
         public void Disconnect(string _IP)
         {
-            ClientInfo temp = null;
-            bool result = Dict_ClientInfo.TryRemove(_IP , out temp);
-            temp?.Soc.Close();
-            DisconnectHandler?.Invoke(result, temp?.IP);
+            var res = from ci in Dict_ClientInfo
+                      where ci.Key.Contains(_IP)
+                      select ci;
+
+            string[] temp_CI = null;
+            string _CI_IP = "";
+            int _CI_PORT = 0;
+            foreach (var _CI in res)
+            {
+                temp_CI = _CI.Key.Split(':');
+                _CI_IP = temp_CI[0];
+                _CI_PORT = Int32.Parse(temp_CI[1]);
+                Disconnect(_CI_IP, _CI_PORT);
+            }
+
         }
         
         public void Close()
         {
             m_ServerSocket.Shutdown(SocketShutdown.Both);
             m_ServerSocket.Close();
-            
-            foreach(KeyValuePair<string , ClientInfo> ci in Dict_ClientInfo)
+
+
+            string[] temp_CI = null;
+            string _CI_IP = "";
+            int _CI_PORT = 0;
+            foreach(KeyValuePair<string , ClientInfo> _CI in Dict_ClientInfo)
             {
-                Disconnect(ci.Key);
+                temp_CI = _CI.Key.Split(':');
+                _CI_IP = temp_CI[0];
+                _CI_PORT = Int32.Parse(temp_CI[1]);
+                Disconnect(_CI_IP, _CI_PORT);
             }
         }
 

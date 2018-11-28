@@ -4,6 +4,11 @@ namespace D_Util
 {
     public class D_InterNet
     {
+        enum SOCKET_ERROR_CODE {
+            NOT_FOUND_SERVER = 10061,
+
+        }
+
         //IPv4 유효성 체크
         public static bool IsIP(string IP)
         {

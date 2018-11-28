@@ -38,14 +38,11 @@ namespace TcpClient
 
                 bool res = await m_Socket.Connect(Connect_Callback, chb_Retry.Checked, 2000);
 
-
-                if (res)
-                    m_Socket.Read(Read_Callback);
+                Console.WriteLine("Control check");
             }
             else
             {
-                m_Socket.Close(Close_Callback);
-                m_Socket = null;
+                ClientClose();
             }
          
 
@@ -63,6 +60,8 @@ namespace TcpClient
                     tb_ReadMsg.Text += "***서버와 연결되었습니다.***\r\n";
                     btn_Connection.Text = "해제";
                     tb_SendMsg.Enabled = true;
+
+                    m_Socket.ReceiveStart(Read_Callback);
                 }
                 else
                 {
@@ -77,9 +76,11 @@ namespace TcpClient
 
         private void Read_Callback(byte[] data)
         {
+            
+            StringBuilder sb = new StringBuilder();
             this.Invoke(new MethodInvoker(() =>
             {
-                StringBuilder sb = new StringBuilder();
+                tb_ReadMsg.Text = "YES";
                 sb.Append(tb_ReadMsg.Text);
                 sb.Append(Encoding.UTF8.GetString(data));
                 sb.Append("\r\n");
@@ -87,24 +88,12 @@ namespace TcpClient
             }));
         }
 
-        private void Close_Callback(bool result)
+        private void ClientClose()
         {
-
-            
-            this.Invoke(new MethodInvoker(() =>
-            {
-                if (result)
-                {
-                    tb_ReadMsg.Text += "***서버와 연결이 끊겼습니다.***\r\n";
-
-                }
-                else
-                {
-                    tb_ReadMsg.Text += "***서버와 연결이 되지않습니다.***\r\n";
-                }
-                btn_Connection.Text = "연결";
-                tb_SendMsg.Enabled = false;
-            }));
+            m_Socket.Close();
+            tb_ReadMsg.Text += "***서버와 연결이 끊겼습니다.***\r\n"; 
+            btn_Connection.Text = "연결";
+            tb_SendMsg.Enabled = false;
             m_Socket = null;
         }
 

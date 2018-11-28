@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace D_TcpServer
 {
-    public delegate void AcceptCallback(string IP);
-    public delegate void ReceiveCallback(byte[] data, string IP);
-    public delegate void DisconnectCallback(bool res, string IP);
+    public delegate void AcceptCallback(string _IP, int _PORT);
+    public delegate void ReceiveCallback(byte[] data, string _IP, int _PORT);
+    public delegate void DisconnectCallback(bool res, string _IP, int _PORT);
 }

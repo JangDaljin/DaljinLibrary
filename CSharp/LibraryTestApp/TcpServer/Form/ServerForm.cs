@@ -51,21 +51,21 @@ namespace TcpServer
             
         }
 
-        private void AcceptCallback(string _IP)
+        private void AcceptCallback(string _IP , int _PORT)
         {
             this.Invoke(
                 new MethodInvoker(() =>
                    {
-                       chlb_ClientList.Items.Add(String.Format("{0}", _IP));
+                       chlb_ClientList.Items.Add(String.Format("{0}:{1}", _IP, _PORT));
                    }));
             
         }
 
-        private void ReceiveCallback(byte[] data, string _IP)
+        private void ReceiveCallback(byte[] data, string _IP , int _PORT)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendLine(tb_ReceiveMsg.Text);
-            sb.Append(_IP);
+            sb.Append(_IP+":"+_PORT);
             sb.Append(":");
             sb.Append(Encoding.UTF8.GetString(data));
 
@@ -77,7 +77,7 @@ namespace TcpServer
             
         }
 
-        private void DisconnectionCallback(bool res , string _IP)
+        private void DisconnectionCallback(bool res , string _IP , int _PORT)
         {
             this.Invoke(
                 new MethodInvoker(
@@ -85,7 +85,7 @@ namespace TcpServer
                     {
                         if (res)
                         {
-                            chlb_ClientList.Items.Remove(_IP);
+                            chlb_ClientList.Items.Remove(string.Format("{0}:{1}",_IP , _PORT));
                         }
                     }));
 
@@ -93,9 +93,34 @@ namespace TcpServer
 
         private void btn_Disconnect_Click(object sender, EventArgs e)
         {
-            while(chlb_ClientList.Items.Count >0)
+            string[] temp_info = null;
+            string _IP = "";
+            int _PORT = 0;
+            while(chlb_ClientList.CheckedItems.Count >0)
             {
-                m_ServerSocket.Disconnect(chlb_ClientList.CheckedItems[0].ToString());
+                temp_info = chlb_ClientList.CheckedItems[0].ToString().Split(':');
+                _IP = temp_info[0];
+                _PORT = Int32.Parse(temp_info[1]);
+                m_ServerSocket.Disconnect(_IP , _PORT);
+            }
+        }
+
+        private void tb_SendMsg_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if(e.KeyChar == (char)Keys.Enter)
+            {
+                string[] temp_info = null;
+                string _IP = "";
+                int _PORT = 0;
+                byte[] data = Encoding.UTF8.GetBytes(tb_SendMsg.Text);
+                while (chlb_ClientList.CheckedItems.Count > 0)
+                {
+                    temp_info = chlb_ClientList.CheckedItems[0].ToString().Split(':');
+                    _IP = temp_info[0];
+                    _PORT = Int32.Parse(temp_info[1]);
+                    m_ServerSocket.SendOne(data , _IP, _PORT);
+                }
+                tb_SendMsg.Text = "";
             }
         }
     }

@@ -18,3 +18,13 @@ C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpClient
 C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.csproj.CoreCompileInputs.cache
 C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.exe
 C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.pdb
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.csprojAssemblyReference.cache
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.TcpClientForm.resources
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.Properties.Resources.resources
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.csproj.GenerateResource.cache
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.csproj.CoreCompileInputs.cache
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.exe
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\obj\Debug\TcpClient.pdb
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\bin\Debug\TcpClient.exe.config
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\bin\Debug\TcpClient.exe
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpClient\bin\Debug\TcpClient.pdb

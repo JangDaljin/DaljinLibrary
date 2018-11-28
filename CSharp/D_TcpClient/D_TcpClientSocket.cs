@@ -21,7 +21,6 @@ namespace D_TcpClient
         private readonly int SERVER_PORT = 0;
 
         public event ConnectCallback ConnectHandler;
-        public event CloseCallback CloseHandler;
         public event ReadDataCallback ReadHandler;
         
         private EventWaitHandle ConnectWaitHandler = null;
@@ -62,6 +61,8 @@ namespace D_TcpClient
                     m_TcpClientSocket = new Socket(AddressFamily.InterNetwork,
                                                    SocketType.Stream,
                                                    ProtocolType.Tcp);
+
+                    
                     ConnectHandler += callback;
                     try
                     {
@@ -78,7 +79,7 @@ namespace D_TcpClient
                             m_TcpClientSocket.Close();
                         }
                     }
-                    catch (Exception e)
+                    catch (SocketException e) when (e.ErrorCode == 10061)
                     {
                         Console.WriteLine("Connection Error");
                         Console.WriteLine(e.Message);
@@ -136,49 +137,34 @@ namespace D_TcpClient
         /*==============================================================================*/
         /*                                     읽기                                     */
         /*==============================================================================*/
-        public void Read(ReadDataCallback callback)
+        public void ReceiveStart(ReadDataCallback callback)
         {
+            ReadHandler += callback;
             if (IsConnected() == false)
             {
                 Console.WriteLine("Socket is not opened. so, Can't read data.");
                 return;
             }
 
-            ReadHandler += callback;
-
-            try
-            {
-                m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length,
-                                               SocketFlags.None,
-                                               AsyncReceiveCallBack, null);
-            }
-            catch(Exception e)
-            {
-                Console.WriteLine("Read Error");
-                Console.WriteLine(e.Message);
-            }
-            
+            m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length, SocketFlags.None, ReceiveCallback, null);
         }
         /*==============================================================================*/
 
-
-
         /*==============================================================================*/
-        /*                                읽기 콜백                                     */
+        /*                                 연결 콜백                                    */
         /*==============================================================================*/
-        private void AsyncReceiveCallBack(IAsyncResult ar)
+        private void ReceiveCallback(IAsyncResult _ar)
         {
             int recvByte = 0;
+
             try
             {
-                recvByte = m_TcpClientSocket.EndReceive(ar);
+                recvByte = m_TcpClientSocket.EndReceive(_ar);
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Console.WriteLine("EndReceive Error");
                 Console.WriteLine(e.Message);
             }
-
 
             if (recvByte > 0)
             {
@@ -187,22 +173,11 @@ namespace D_TcpClient
                 Array.Clear(m_Readbuffer, 0, m_Readbuffer.Length);
             }
 
-            if (IsConnected() == false) { return; }
-
-            try
-            {
-                m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length,
-                                               SocketFlags.None,
-                                               AsyncReceiveCallBack, null);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("BeginReceive Error");
-                Console.WriteLine(e.Message);
-            }
-
+            m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length, SocketFlags.None, 
+                ReceiveCallback, null);
         }
         /*==============================================================================*/
+
 
 
 
@@ -213,9 +188,17 @@ namespace D_TcpClient
         {
             if(IsConnected() == false) { return; }
 
-            m_TcpClientSocket.BeginSend(buffer, 0, buffer.Length,
-                                        SocketFlags.None,
-                                        AsyncSendCallback, null);
+            try
+            {
+                m_TcpClientSocket.BeginSend(buffer, 0, buffer.Length,
+                                            SocketFlags.None,
+                                            AsyncSendCallback, null);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("BeginSend Error" + e.Message);
+                return;
+            }
         }
         /*==============================================================================*/
 
@@ -226,7 +209,15 @@ namespace D_TcpClient
         /*==============================================================================*/
         private void AsyncSendCallback(IAsyncResult ar)
         {
-            m_TcpClientSocket.EndSend(ar);
+            try
+            {
+                m_TcpClientSocket.EndSend(ar);
+            }
+            catch(Exception e)
+            {
+                Console.WriteLine("EndSend Error"+e.Message);
+                return;
+            }
         }
         /*==============================================================================*/
 
@@ -251,23 +242,17 @@ namespace D_TcpClient
         /*==============================================================================*/
         /*                                     종료                                     */
         /*==============================================================================*/
-        public void Close(CloseCallback callback = null)
+        public void Close()
         {
-            CloseHandler += callback;
 
-            m_TcpClientSocket.Close();
+            m_TcpClientSocket?.Close();
             m_TcpClientSocket = null;
             m_Readbuffer = null;
             Connected = false;
             
-
-            CloseHandler?.Invoke(true);
-
             ConnectHandler = null;
             ReadHandler = null;
-            CloseHandler = null;
-
-
+            
         }
         /*==============================================================================*/
     }

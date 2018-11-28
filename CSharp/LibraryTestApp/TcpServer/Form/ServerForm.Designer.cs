@@ -97,6 +97,7 @@
             this.tb_SendMsg.Name = "tb_SendMsg";
             this.tb_SendMsg.Size = new System.Drawing.Size(543, 21);
             this.tb_SendMsg.TabIndex = 6;
+            this.tb_SendMsg.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tb_SendMsg_KeyPress);
             // 
             // ServerForm
             // 

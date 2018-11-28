@@ -8,3 +8,13 @@ C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpServer
 C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.csproj.CoreCompileInputs.cache
 C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.exe
 C:\Users\toyyj\Desktop\Programming\DaljinLibrary\Csharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.pdb
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.csprojAssemblyReference.cache
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.ServerForm.resources
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.Properties.Resources.resources
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.csproj.GenerateResource.cache
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.csproj.CoreCompileInputs.cache
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.exe
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\obj\Debug\TcpServer.pdb
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\bin\Debug\TcpServer.exe.config
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\bin\Debug\TcpServer.exe
+C:\Users\wonjin\Desktop\Programming\DaljinLibrary\CSharp\LibraryTestApp\TcpServer\bin\Debug\TcpServer.pdb
