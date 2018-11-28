@@ -7,5 +7,6 @@ using System.Threading.Tasks;
 namespace D_TcpClient
 {
     public delegate void ConnectCallback(bool result);
-    public delegate void ReadDataCallback(byte[] data);
+    public delegate void ReceiveCallback(byte[] data);
+    public delegate void CloseCallback();
 }

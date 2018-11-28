@@ -22,7 +22,7 @@ namespace TcpServer
 
         private void btn_OpenClose_Click(object sender, EventArgs e)
         {
-            if (!D_Util.D_InterNet.IsPORT(tb_Port.Text))
+            if (!D_Util.ValidData.IsPORT(tb_Port.Text))
             {
                 MessageBox.Show("포트번호가 잘못되었습니다.");
                 return;
@@ -39,7 +39,8 @@ namespace TcpServer
                 m_ServerSocket.Accept();
 
                 tb_ReceiveMsg.Text += "***서버가 열렸습니다.***\r\n";
-                    
+                btn_OpenClose.Text = "닫기";
+
             }
             else
             {
@@ -47,8 +48,8 @@ namespace TcpServer
                 m_ServerSocket = null;
 
                 tb_ReceiveMsg.Text += "***서버가 닫혔습니다.***\r\n";
+                btn_OpenClose.Text = "열기";
             }
-            
         }
 
         private void AcceptCallback(string _IP , int _PORT)

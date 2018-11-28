@@ -113,7 +113,7 @@
             // btn_Stop
             // 
             this.btn_Stop.Enabled = false;
-            this.btn_Stop.Location = new System.Drawing.Point(180, 105);
+            this.btn_Stop.Location = new System.Drawing.Point(180, 104);
             this.btn_Stop.Name = "btn_Stop";
             this.btn_Stop.Size = new System.Drawing.Size(117, 23);
             this.btn_Stop.TabIndex = 10;

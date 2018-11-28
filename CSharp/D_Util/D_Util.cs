@@ -2,13 +2,20 @@
 
 namespace D_Util
 {
-    public class D_InterNet
+    namespace D_InterNet
     {
-        enum SOCKET_ERROR_CODE {
+        //소켓 에러코드
+        public enum SOCKET_ERROR_CODE
+        {
             NOT_FOUND_SERVER = 10061,
-
+            DISCONNECTED = 10054,
+            CLOSE_INTERRUPT = 10004,
         }
+    }
 
+
+    static class ValidData
+    {
         //IPv4 유효성 체크
         public static bool IsIP(string IP)
         {

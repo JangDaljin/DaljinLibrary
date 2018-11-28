@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
 using System.Collections.Concurrent;
+using D_Util.D_InterNet;
 
 namespace D_TcpServer
 {
@@ -61,7 +62,16 @@ namespace D_TcpServer
             {
                 while (!Closed)
                 {
-                    Socket ClientSoc = m_ServerSocket.Accept();
+                    Socket ClientSoc = null;
+                    try
+                    {
+                        ClientSoc = m_ServerSocket.Accept();
+                    }
+                    catch(SocketException e) when (e.ErrorCode == (int)SOCKET_ERROR_CODE.CLOSE_INTERRUPT)
+                    {
+                        Console.WriteLine("SOCKET INTERRUPT");
+                        return;
+                    }
 
                     ClientInfo con_CI = new ClientInfo();
                     con_CI.Soc = ClientSoc;
@@ -90,15 +100,15 @@ namespace D_TcpServer
             {
                 data_len = _CI.Soc.EndReceive(_ar);
             }
-            catch(SocketException soc_e)
+            catch(SocketException soc_e) when (soc_e.ErrorCode == (int)SOCKET_ERROR_CODE.DISCONNECTED)
             {
-                Console.WriteLine(soc_e.Message);
+                Console.WriteLine(string.Format("{0}:{1} has disconnected" , _CI.IP , _CI.PORT));
                 Disconnect(_CI.IP, _CI.PORT);
                 return;
             }
             catch(ObjectDisposedException od_e)
             {
-                Console.WriteLine(od_e);
+                Console.WriteLine(string.Format("{0}:{1} Already Close", _CI.IP, _CI.PORT));
                 return;
             }
 
@@ -129,7 +139,7 @@ namespace D_TcpServer
             ClientInfo temp = null;
             bool result = Dict_ClientInfo.TryRemove(string.Format("{0}:{1}",_IP ,_PORT) , out temp);
             temp?.Soc.Close();
-            DisconnectHandler?.Invoke(result, temp?.IP , temp.PORT);
+            DisconnectHandler?.Invoke(result, temp.IP , temp.PORT);
         }
 
         public void Disconnect(string _IP)
@@ -153,7 +163,6 @@ namespace D_TcpServer
         
         public void Close()
         {
-            m_ServerSocket.Shutdown(SocketShutdown.Both);
             m_ServerSocket.Close();
 
 

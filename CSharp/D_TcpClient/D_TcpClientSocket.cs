@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using D_Util.D_InterNet;
 
 namespace D_TcpClient
 {
@@ -21,21 +22,28 @@ namespace D_TcpClient
         private readonly int SERVER_PORT = 0;
 
         public event ConnectCallback ConnectHandler;
-        public event ReadDataCallback ReceiveHandler;
+        public event ReceiveCallback ReceiveHandler;
+        public event CloseCallback CloseHandler;
         
-        private EventWaitHandle ConnectWaitHandler = null;
 
 
         /*==============================================================================*/
         /*                                  생성자(IP , PORT)                           */
         /*==============================================================================*/
-        public D_TcpClientSocket(string _IP = D_Configuration.SERVER_IP, int _PORT = D_Configuration.SERVER_PORT)
+        public D_TcpClientSocket(string _IP = D_Configuration.SERVER_IP, int _PORT = D_Configuration.SERVER_PORT,
+                                 ConnectCallback connectCallback = null,
+                                 ReceiveCallback receiveDataCallback = null,
+                                 CloseCallback closeCallback = null)
         {
-            SERVER_IP = (D_Util.D_InterNet.IsIP(_IP)) ? _IP : throw new ArgumentException("IP is wrong", "_IP");
-            SERVER_PORT = (D_Util.D_InterNet.IsPORT(_PORT)) ? _PORT : throw new ArgumentException("PORT is wrong", "_PORT");
+            SERVER_IP = (D_Util.ValidData.IsIP(_IP)) ? _IP : throw new ArgumentException("IP is wrong", "_IP");
+            SERVER_PORT = (D_Util.ValidData.IsPORT(_PORT)) ? _PORT : throw new ArgumentException("PORT is wrong", "_PORT");
             SERVER_IPENDPOINT = new IPEndPoint(IPAddress.Parse(SERVER_IP), SERVER_PORT);
             Connected = false;
             m_Readbuffer = new byte[1024];
+
+            ConnectHandler  += connectCallback;
+            ReceiveHandler  += receiveDataCallback;
+            CloseHandler += closeCallback;
         }
         /*==============================================================================*/
 
@@ -44,7 +52,7 @@ namespace D_TcpClient
         /*==============================================================================*/
         /*                                     연결                                     */
         /*==============================================================================*/
-        public async void Connect(ConnectCallback callback = null, bool _retry = false , int timeout = 10000)
+        public async void Connect(bool _retry = false , int timeout = 10000)
         {
             ConnectRetry = _retry;
             await Task.Run(new Action( ()=> {
@@ -61,9 +69,7 @@ namespace D_TcpClient
                     m_TcpClientSocket = new Socket(AddressFamily.InterNetwork,
                                                    SocketType.Stream,
                                                    ProtocolType.Tcp);
-
                     
-                    ConnectHandler += callback;
                     try
                     {
                         IAsyncResult ar = m_TcpClientSocket.BeginConnect((EndPoint)SERVER_IPENDPOINT,
@@ -79,11 +85,9 @@ namespace D_TcpClient
                             m_TcpClientSocket.Close();
                         }
                     }
-                    catch (SocketException e) when (e.ErrorCode == 10061)
+                    catch (SocketException e) when (e.ErrorCode == (int)SOCKET_ERROR_CODE.NOT_FOUND_SERVER)
                     {
-                        Console.WriteLine("Connection Error");
-                        Console.WriteLine(e.Message);
-
+                        Console.WriteLine("Not found server");
                         result = false;
                     }
                     finally
@@ -91,7 +95,7 @@ namespace D_TcpClient
                         Connected = result;                             //연결 상태 ON
                         ConnectHandler?.Invoke(result);                 //콜백 함수 실행
 
-                        if(!result) { Close(); }
+                        if(!result) { m_TcpClientSocket = null; }
                     }
                 } while (ConnectRetry && IsConnected() == false);
 
@@ -100,59 +104,26 @@ namespace D_TcpClient
         }
         /*==============================================================================*/
 
-
-
-
-        /*==============================================================================*/
-        /*                                 연결 콜백                                    */
-        /*==============================================================================*/
-        //사용 안함
-        [Obsolete("Connection is block method")]
-        private void AsyncConnectCallback(IAsyncResult ar)
-        {
-            bool result = false;
-            try
-            {
-                m_TcpClientSocket.EndConnect(ar);
-                result = true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("EndConnect Error");
-                Console.WriteLine(e.Message);
-                result = false;
-            }
-            finally
-            {
-                Connected = result;                 //연결 상태 ON
-                ConnectWaitHandler.Set();           //Block 해제
-            }
-            ConnectHandler?.Invoke(result);                 //콜백 함수 실행
-        }
-        /*==============================================================================*/
-
-
-
         /*==============================================================================*/
         /*                                     읽기                                     */
         /*==============================================================================*/
-        public void ReceiveStart(ReadDataCallback callback)
+        public void Receive()
         {
-            ReceiveHandler += callback;
+            
             if (IsConnected() == false)
             {
                 Console.WriteLine("Socket is not opened. so, Can't read data.");
                 return;
             }
 
-            m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length, SocketFlags.None, ReceiveCallback, null);
+            ReceiveStart();
         }
         /*==============================================================================*/
 
         /*==============================================================================*/
         /*                                 읽기 콜백                                    */
         /*==============================================================================*/
-        private void ReceiveCallback(IAsyncResult _ar)
+        private void AsyncReceiveCallback(IAsyncResult _ar)
         {
             int recvByte = 0;
 
@@ -160,10 +131,17 @@ namespace D_TcpClient
             {
                 recvByte = m_TcpClientSocket.EndReceive(_ar);
             }
-            catch(Exception e)
+            catch(SocketException e) when (e.ErrorCode == (int)SOCKET_ERROR_CODE.DISCONNECTED)
             {
-                Console.WriteLine(e.Message);
+                Console.WriteLine("Server has disconnected");
+                Close();
+                return;
             }
+            catch(NullReferenceException null_e)
+            {
+                return;
+            }
+            
 
             if (recvByte > 0)
             {
@@ -172,11 +150,28 @@ namespace D_TcpClient
                 Array.Clear(m_Readbuffer, 0, m_Readbuffer.Length);
             }
 
-            m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length, SocketFlags.None, 
-                ReceiveCallback, null);
+            ReceiveStart();
         }
         /*==============================================================================*/
 
+        /*==============================================================================*/
+        /*                                 읽기 시작                                    */
+        /*==============================================================================*/
+        private void ReceiveStart()
+        {
+            try
+            {
+                m_TcpClientSocket.BeginReceive(m_Readbuffer, 0, m_Readbuffer.Length, SocketFlags.None,
+                    AsyncReceiveCallback, null);
+            }
+            catch (SocketException e) when (e.ErrorCode == (int)SOCKET_ERROR_CODE.DISCONNECTED)
+            {
+                Console.WriteLine("Server has disconnected you");
+                Close();
+                return;
+            }
+        }
+        /*==============================================================================*/
 
 
 
@@ -195,7 +190,9 @@ namespace D_TcpClient
             }
             catch(Exception e)
             {
-                Console.WriteLine("BeginSend Error" + e.Message);
+                Console.WriteLine("[CLIENT]Write() Catch");
+                Console.WriteLine(e.Message);
+                Close();
                 return;
             }
         }
@@ -214,7 +211,9 @@ namespace D_TcpClient
             }
             catch(Exception e)
             {
-                Console.WriteLine("EndSend Error"+e.Message);
+                Console.WriteLine("[CLIENT]SendCallback() catch");
+                Console.WriteLine(e.Message);
+                Close();
                 return;
             }
         }
@@ -248,10 +247,12 @@ namespace D_TcpClient
             m_TcpClientSocket = null;
             m_Readbuffer = null;
             Connected = false;
-            
+
+            CloseHandler?.Invoke();
+
             ConnectHandler = null;
             ReceiveHandler = null;
-            
+            CloseHandler = null;
         }
         /*==============================================================================*/
     }
