@@ -34,9 +34,7 @@
             this.lab_ServerPort = new System.Windows.Forms.Label();
             this.tb_ReadMsg = new System.Windows.Forms.TextBox();
             this.tb_SendMsg = new System.Windows.Forms.TextBox();
-            this.btn_Connection = new System.Windows.Forms.Button();
-            this.chb_Retry = new System.Windows.Forms.CheckBox();
-            this.btn_Stop = new System.Windows.Forms.Button();
+            this.btn_Connect = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // tb_ServerIP
@@ -90,46 +88,22 @@
             this.tb_SendMsg.TabIndex = 5;
             this.tb_SendMsg.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.tb_SendMsg_KeyPress);
             // 
-            // btn_Connection
+            // btn_Connect
             // 
-            this.btn_Connection.Location = new System.Drawing.Point(180, 75);
-            this.btn_Connection.Name = "btn_Connection";
-            this.btn_Connection.Size = new System.Drawing.Size(117, 23);
-            this.btn_Connection.TabIndex = 8;
-            this.btn_Connection.Text = "연결";
-            this.btn_Connection.UseVisualStyleBackColor = true;
-            this.btn_Connection.Click += new System.EventHandler(this.btn_Connection_Click);
-            // 
-            // chb_Retry
-            // 
-            this.chb_Retry.Location = new System.Drawing.Point(97, 75);
-            this.chb_Retry.Name = "chb_Retry";
-            this.chb_Retry.Size = new System.Drawing.Size(77, 24);
-            this.chb_Retry.TabIndex = 9;
-            this.chb_Retry.Text = "자동 접속";
-            this.chb_Retry.UseVisualStyleBackColor = true;
-            this.chb_Retry.CheckedChanged += new System.EventHandler(this.chb_Retry_CheckedChanged);
-            // 
-            // btn_Stop
-            // 
-            this.btn_Stop.Enabled = false;
-            this.btn_Stop.Location = new System.Drawing.Point(180, 104);
-            this.btn_Stop.Name = "btn_Stop";
-            this.btn_Stop.Size = new System.Drawing.Size(117, 23);
-            this.btn_Stop.TabIndex = 10;
-            this.btn_Stop.Text = "중지";
-            this.btn_Stop.UseVisualStyleBackColor = true;
-            this.btn_Stop.Visible = false;
-            this.btn_Stop.Click += new System.EventHandler(this.btn_Stop_Click);
+            this.btn_Connect.Location = new System.Drawing.Point(180, 75);
+            this.btn_Connect.Name = "btn_Connect";
+            this.btn_Connect.Size = new System.Drawing.Size(117, 23);
+            this.btn_Connect.TabIndex = 8;
+            this.btn_Connect.Text = "연결";
+            this.btn_Connect.UseVisualStyleBackColor = true;
+            this.btn_Connect.Click += new System.EventHandler(this.btn_Connection_Click);
             // 
             // TcpClientForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.btn_Stop);
-            this.Controls.Add(this.chb_Retry);
-            this.Controls.Add(this.btn_Connection);
+            this.Controls.Add(this.btn_Connect);
             this.Controls.Add(this.tb_SendMsg);
             this.Controls.Add(this.tb_ReadMsg);
             this.Controls.Add(this.lab_ServerPort);
@@ -154,9 +128,7 @@
         private System.Windows.Forms.Label lab_ServerPort;
         private System.Windows.Forms.TextBox tb_ReadMsg;
         private System.Windows.Forms.TextBox tb_SendMsg;
-        private System.Windows.Forms.Button btn_Connection;
-        private System.Windows.Forms.CheckBox chb_Retry;
-        private System.Windows.Forms.Button btn_Stop;
+        private System.Windows.Forms.Button btn_Connect;
     }
 }
 

@@ -90,6 +90,10 @@ namespace D_TcpClient
                         Console.WriteLine("Not found server");
                         result = false;
                     }
+                    catch(Exception)
+                    {
+                        result = false;
+                    }
                     finally
                     {
                         Connected = result;                             //연결 상태 ON

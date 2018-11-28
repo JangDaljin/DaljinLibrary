@@ -24,25 +24,33 @@ namespace TcpClient
 
         private void btn_Connection_Click(object sender, EventArgs e)
         {
-            btn_Connection.Enabled = false;
-            btn_Stop.Enabled = true;
-            chb_Retry.Enabled = false;
+            btn_Connect.Enabled = false;
+            tb_ServerIP.Enabled = false;
+            tb_ServerPort.Enabled = false;
 
             SERVER_IP = D_Util.ValidData.IsIP(tb_ServerIP.Text.ToString()) ? tb_ServerIP.Text.ToString() : D_TcpClient.D_Configuration.SERVER_IP;
             SERVER_PORT = D_Util.ValidData.IsPORT(tb_ServerPort.Text.ToString()) ? int.Parse(tb_ServerPort.Text.ToString()) : D_TcpClient.D_Configuration.SERVER_PORT;
 
+            //연결
             if(m_Socket == null)
             {
                 m_Socket = new D_TcpClient.D_TcpClientSocket(SERVER_IP, SERVER_PORT , 
                     Connect_Callback , Read_Callback , Close_Callback);
 
 
-                m_Socket.Connect(chb_Retry.Checked, 2000);
+                m_Socket.Connect(false, 2000);
             }
+            //해제
             else
             {
                 m_Socket.Close();
+                m_Socket = null;
             }
+        }
+
+        private void btn_ContinueConnect_Click(object sender, EventArgs e)
+        {
+            m_Socket.ConnectRetry = false;
         }
 
         private void Connect_Callback(bool result)
@@ -52,25 +60,24 @@ namespace TcpClient
                 if (result)
                 {
                     tb_ReadMsg.Text += "***서버와 연결되었습니다.***\r\n";
-                    btn_Connection.Text = "해제";
+
+                    btn_Connect.Text = "해제";
                     tb_SendMsg.Enabled = true;
-                    btn_Connection.Enabled = true;
-                    chb_Retry.Enabled = true;
+                    btn_Connect.Enabled = true;
+                    tb_ServerIP.Enabled = false;
+                    tb_ServerPort.Enabled = false;
+
                     m_Socket.Receive();
                 }
                 else
                 {
                     tb_ReadMsg.Text += "***서버와 연결이 되지않습니다.***\r\n";
-                    btn_Connection.Text = "연결";
-                    tb_SendMsg.Enabled = false;
-                    
 
-                    if(chb_Retry.Checked == false)
-                    {
-                        btn_Connection.Enabled = true;
-                        chb_Retry.Enabled = true;
-                        m_Socket = null;
-                    }
+                    btn_Connect.Text = "연결";
+                    btn_Connect.Enabled = true;
+                    tb_ServerPort.Enabled = true;
+                    tb_ServerIP.Enabled = true;
+                    m_Socket = null;
                 }
 
             }
@@ -102,12 +109,12 @@ namespace TcpClient
                 () =>
                 {
                     tb_ReadMsg.Text += "***서버와 연결이 끊겼습니다.***\r\n";
-                    btn_Connection.Text = "연결";
-                    btn_Connection.Enabled = true;
+                    btn_Connect.Text = "연결";
+                    btn_Connect.Enabled = true;
                     tb_SendMsg.Enabled = false;
-                    chb_Retry.Enabled = true;
+                    tb_ServerPort.Enabled = true;
+                    tb_ServerIP.Enabled = true;
                     m_Socket = null;
-
                 }));
 
         }
@@ -121,21 +128,11 @@ namespace TcpClient
             }
         }
 
-        private void btn_Stop_Click(object sender, EventArgs e)
-        {
-            m_Socket.ConnectRetry = false;
-        }
+
 
         private void chb_Retry_CheckedChanged(object sender, EventArgs e)
         {
-            if(((CheckBox)sender).Checked == true)
-            {
-                btn_Stop.Visible = true;
-            }
-            else
-            {
-                btn_Stop.Visible = false;
-            }
+            
         }
     }
 }
