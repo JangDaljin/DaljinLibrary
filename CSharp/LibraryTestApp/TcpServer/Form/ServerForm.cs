@@ -113,9 +113,9 @@ namespace TcpServer
                 string _IP = "";
                 int _PORT = 0;
                 byte[] data = Encoding.UTF8.GetBytes(tb_SendMsg.Text);
-                while (chlb_ClientList.CheckedItems.Count > 0)
+                for (int i =0; i < chlb_ClientList.CheckedItems.Count; i++)
                 {
-                    temp_info = chlb_ClientList.CheckedItems[0].ToString().Split(':');
+                    temp_info = chlb_ClientList.CheckedItems[i].ToString().Split(':');
                     _IP = temp_info[0];
                     _PORT = Int32.Parse(temp_info[1]);
                     m_ServerSocket.SendOne(data , _IP, _PORT);

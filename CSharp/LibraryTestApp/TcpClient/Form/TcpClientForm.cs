@@ -22,7 +22,7 @@ namespace TcpClient
             InitializeComponent();
         }
 
-        private async void btn_Connection_Click(object sender, EventArgs e)
+        private void btn_Connection_Click(object sender, EventArgs e)
         {
             btn_Connection.Enabled = false;
             btn_Stop.Enabled = true;
@@ -36,9 +36,7 @@ namespace TcpClient
                 m_Socket = new D_TcpClient.D_TcpClientSocket(SERVER_IP, SERVER_PORT);
 
 
-                bool res = await m_Socket.Connect(Connect_Callback, chb_Retry.Checked, 2000);
-
-                Console.WriteLine("Control check");
+                m_Socket.Connect(Connect_Callback, chb_Retry.Checked, 2000);
             }
             else
             {
@@ -76,16 +74,23 @@ namespace TcpClient
 
         private void Read_Callback(byte[] data)
         {
-            
-            StringBuilder sb = new StringBuilder();
-            this.Invoke(new MethodInvoker(() =>
+            if(this.InvokeRequired)
             {
-                tb_ReadMsg.Text = "YES";
-                sb.Append(tb_ReadMsg.Text);
-                sb.Append(Encoding.UTF8.GetString(data));
-                sb.Append("\r\n");
-                tb_ReadMsg.Text = sb.ToString();
-            }));
+                this.Invoke(new MethodInvoker(() =>
+                {
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append(tb_ReadMsg.Text + "\r\n");
+                    sb.Append(Encoding.UTF8.GetString(data));
+                    sb.Append("\r\n");
+                    tb_ReadMsg.Text = sb.ToString();
+                }));
+            }
+            else
+            {
+                Console.WriteLine(Encoding.UTF8.GetString(data));
+            }
+            
+
         }
 
         private void ClientClose()

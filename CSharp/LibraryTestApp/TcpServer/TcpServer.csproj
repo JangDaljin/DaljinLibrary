@@ -49,12 +49,10 @@
     <Compile Include="..\..\D_TcpServer\D_ServerDeligate.cs">
       <Link>D_ServerDeligate.cs</Link>
     </Compile>
-    <Compile Include="..\..\D_TcpServer\D_TcpServer.cs">
-      <Link>D_TcpServer.cs</Link>
-    </Compile>
     <Compile Include="..\..\D_Util\D_Util.cs">
       <Link>D_Util.cs</Link>
     </Compile>
+    <Compile Include="D_TcpServerSocket.cs" />
     <Compile Include="Form\ServerForm.cs">
       <SubType>Form</SubType>
     </Compile>

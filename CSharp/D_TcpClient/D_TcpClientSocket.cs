@@ -21,7 +21,7 @@ namespace D_TcpClient
         private readonly int SERVER_PORT = 0;
 
         public event ConnectCallback ConnectHandler;
-        public event ReadDataCallback ReadHandler;
+        public event ReadDataCallback ReceiveHandler;
         
         private EventWaitHandle ConnectWaitHandler = null;
 
@@ -44,10 +44,10 @@ namespace D_TcpClient
         /*==============================================================================*/
         /*                                     연결                                     */
         /*==============================================================================*/
-        public async Task<bool> Connect(ConnectCallback callback = null, bool _retry = false , int timeout = 10000)
+        public async void Connect(ConnectCallback callback = null, bool _retry = false , int timeout = 10000)
         {
             ConnectRetry = _retry;
-            return await Task<bool>.Run(new Func<bool>( ()=> {
+            await Task.Run(new Action( ()=> {
 
                 bool result = false;
 
@@ -94,7 +94,6 @@ namespace D_TcpClient
                         if(!result) { Close(); }
                     }
                 } while (ConnectRetry && IsConnected() == false);
-                return result;
 
             }));
             
@@ -139,7 +138,7 @@ namespace D_TcpClient
         /*==============================================================================*/
         public void ReceiveStart(ReadDataCallback callback)
         {
-            ReadHandler += callback;
+            ReceiveHandler += callback;
             if (IsConnected() == false)
             {
                 Console.WriteLine("Socket is not opened. so, Can't read data.");
@@ -151,7 +150,7 @@ namespace D_TcpClient
         /*==============================================================================*/
 
         /*==============================================================================*/
-        /*                                 연결 콜백                                    */
+        /*                                 읽기 콜백                                    */
         /*==============================================================================*/
         private void ReceiveCallback(IAsyncResult _ar)
         {
@@ -168,7 +167,7 @@ namespace D_TcpClient
 
             if (recvByte > 0)
             {
-                ReadHandler?.Invoke(m_Readbuffer);
+                ReceiveHandler?.Invoke(m_Readbuffer);
 
                 Array.Clear(m_Readbuffer, 0, m_Readbuffer.Length);
             }
@@ -251,7 +250,7 @@ namespace D_TcpClient
             Connected = false;
             
             ConnectHandler = null;
-            ReadHandler = null;
+            ReceiveHandler = null;
             
         }
         /*==============================================================================*/
