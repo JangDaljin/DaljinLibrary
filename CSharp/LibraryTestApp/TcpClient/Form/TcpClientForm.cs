@@ -38,7 +38,7 @@ namespace TcpClient
                     Connect_Callback , Read_Callback , Close_Callback);
 
 
-                m_Socket.Connect(false, 2000);
+                m_Socket.Connect(2000);
             }
             //해제
             else
@@ -46,11 +46,6 @@ namespace TcpClient
                 m_Socket.Close();
                 m_Socket = null;
             }
-        }
-
-        private void btn_ContinueConnect_Click(object sender, EventArgs e)
-        {
-            m_Socket.ConnectRetry = false;
         }
 
         private void Connect_Callback(bool result)
@@ -129,10 +124,5 @@ namespace TcpClient
         }
 
 
-
-        private void chb_Retry_CheckedChanged(object sender, EventArgs e)
-        {
-            
-        }
     }
 }

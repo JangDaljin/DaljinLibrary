@@ -15,7 +15,6 @@ namespace D_TcpClient
         private byte[] m_Readbuffer = null;
 
         public bool Connected { get; private set; }
-        public bool ConnectRetry { get; set; }
         
         private readonly IPEndPoint SERVER_IPENDPOINT = null;
         private readonly string SERVER_IP = null;
@@ -52,56 +51,53 @@ namespace D_TcpClient
         /*==============================================================================*/
         /*                                     연결                                     */
         /*==============================================================================*/
-        public async void Connect(bool _retry = false , int timeout = 10000)
+        public async void Connect(int timeout = 10000)
         {
-            ConnectRetry = _retry;
             await Task.Run(new Action( ()=> {
 
                 bool result = false;
-
-                do
+                
+                if (m_TcpClientSocket != null)
                 {
-                    if (m_TcpClientSocket != null)
-                    {
-                        Close();
-                    }
+                    Close();
+                }
 
-                    m_TcpClientSocket = new Socket(AddressFamily.InterNetwork,
-                                                   SocketType.Stream,
-                                                   ProtocolType.Tcp);
+                m_TcpClientSocket = new Socket(AddressFamily.InterNetwork,
+                                                SocketType.Stream,
+                                                ProtocolType.Tcp);
                     
-                    try
+                try
+                {
+                    IAsyncResult ar = m_TcpClientSocket.BeginConnect((EndPoint)SERVER_IPENDPOINT,
+                                                    null,
+                                                    null);
+                    result = ar.AsyncWaitHandle.WaitOne(timeout, true);
+                    if (result)
                     {
-                        IAsyncResult ar = m_TcpClientSocket.BeginConnect((EndPoint)SERVER_IPENDPOINT,
-                                                        null,
-                                                        null);
-                        result = ar.AsyncWaitHandle.WaitOne(timeout, true);
-                        if (result)
-                        {
-                            m_TcpClientSocket.EndConnect(ar);
-                        }
-                        else
-                        {
-                            m_TcpClientSocket.Close();
-                        }
+                        m_TcpClientSocket.EndConnect(ar);
                     }
-                    catch (SocketException e) when (e.ErrorCode == (int)SOCKET_ERROR_CODE.NOT_FOUND_SERVER)
+                    else
                     {
-                        Console.WriteLine("Not found server");
-                        result = false;
+                        m_TcpClientSocket.Close();
                     }
-                    catch(Exception)
-                    {
-                        result = false;
-                    }
-                    finally
-                    {
-                        Connected = result;                             //연결 상태 ON
-                        ConnectHandler?.Invoke(result);                 //콜백 함수 실행
+                }
+                catch (SocketException e) when (e.ErrorCode == (int)SOCKET_ERROR_CODE.NOT_FOUND_SERVER)
+                {
+                    Console.WriteLine("Not found server");
+                    result = false;
+                }
+                catch(Exception)
+                {
+                    result = false;
+                }
+                finally
+                {
+                    Connected = result;                             //연결 상태 ON
+                    ConnectHandler?.Invoke(result);                 //콜백 함수 실행
 
-                        if(!result) { m_TcpClientSocket = null; }
-                    }
-                } while (ConnectRetry && IsConnected() == false);
+                    if(!result) { m_TcpClientSocket = null; }
+                }
+
 
             }));
             
@@ -141,8 +137,9 @@ namespace D_TcpClient
                 Close();
                 return;
             }
-            catch(NullReferenceException null_e)
+            catch(NullReferenceException)
             {
+                Close();
                 return;
             }
             
@@ -192,10 +189,9 @@ namespace D_TcpClient
                                             SocketFlags.None,
                                             AsyncSendCallback, null);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Console.WriteLine("[CLIENT]Write() Catch");
-                Console.WriteLine(e.Message);
                 Close();
                 return;
             }
@@ -213,10 +209,9 @@ namespace D_TcpClient
             {
                 m_TcpClientSocket.EndSend(ar);
             }
-            catch(Exception e)
+            catch(Exception)
             {
                 Console.WriteLine("[CLIENT]SendCallback() catch");
-                Console.WriteLine(e.Message);
                 Close();
                 return;
             }

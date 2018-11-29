@@ -24,7 +24,7 @@ namespace D_TcpServer
                 buffer = new byte[1024];
             }
 
-            public ClientInfo(int buffersize = 1024)
+            public ClientInfo(int buffersize)
             {
                 buffer = new byte[buffersize];
             }
@@ -106,7 +106,7 @@ namespace D_TcpServer
                 Disconnect(_CI.IP, _CI.PORT);
                 return;
             }
-            catch(ObjectDisposedException od_e)
+            catch(ObjectDisposedException)
             {
                 Console.WriteLine(string.Format("{0}:{1} Already Close", _CI.IP, _CI.PORT));
                 return;
